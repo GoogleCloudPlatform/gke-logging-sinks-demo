@@ -231,3 +231,6 @@ before determining that something is not working properly.
 * [Overview of Logs Exports](https://cloud.google.com/logging/docs/export/)
 * [Procesing Logs at Scale Using Cloud Dataflow](https://cloud.google.com/solutions/processing-logs-at-scale-using-dataflow)
 * [Terraform Google Cloud Provider](https://www.terraform.io/docs/providers/google/index.html)
+
+
+**This is not an officially supported Google product**
