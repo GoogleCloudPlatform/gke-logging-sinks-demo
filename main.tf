@@ -64,11 +64,6 @@ resource "google_container_cluster" "primary" {
   zone               = "${var.zone}"
   initial_node_count = 2
 
-  additional_zones = [
-    "us-central1-b",
-    "us-central1-c",
-  ]
-
   node_config {
     oauth_scopes = [
       "https://www.googleapis.com/auth/compute",

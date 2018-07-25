@@ -14,6 +14,7 @@
 * [Validation](#validation)
   * [Generating Logs](#generating-logs)
   * [Logs in the Stackdriver UI](#logs-in-the-stackdriver-ui)
+  * [Viewing Log Exports](#viewing-log-exports)
   * [Logs in Cloud Storage](#logs-in-cloud-storage)
   * [Logs in BigQuery](#logs-in-bigquery)
 * [Teardown](#teardown)
@@ -22,9 +23,7 @@
 * [Relevant Material](#relevant-material)
 
 ## Introduction
-A common goal of cloud computing is to abstract away operational tasks from applications so that developer efforts can focus on providing business value. One feature common to most applications is the need to accumulate logs and to provide for the ability to search them. On [Google Cloud Platform (GCP)](https://cloud.google.com/) the [Stackdriver](https://cloud.google.com/stackdriver/) suite of products addresses the need for logging in addition to other related features such as monitoring and tracing.
-
-Stackdriver Logging can be used to log from all GCP resources as well as any custom resources (on other platforms) to allow for one centralized store for all logs and metrics.  Logs are aggregated and then viewable within the provided Stackdriver Logging UI. They can also be [exported to Sinks](https://cloud.google.com/logging/docs/export/configure_export_v2) to support more specialized of use cases.  Currently, Stackdriver Logging supports exporting to the following sinks:
+Stackdriver Logging can be used aggregate logs from all GCP resources as well as any custom resources (on other platforms) to allow for one centralized store for all logs and metrics.  Logs are aggregated and then viewable within the provided Stackdriver Logging UI. They can also be [exported to Sinks](https://cloud.google.com/logging/docs/export/configure_export_v2) to support more specialized of use cases.  Currently, Stackdriver Logging supports exporting to the following sinks:
 * Cloud Storage
 * Pub/Sub
 * BigQuery
@@ -101,14 +100,27 @@ If you need to override any of the defaults, simply replace the desired value(s)
 
 There are three Terraform files provided with this example. The first one, `main.tf`, is the starting point for Terraform. It describes the features that will be used, the resources that will be manipulated, and the outputs that will result. The second file is `provider.tf`, which indicates which cloud provider and version will be the target of the Terraform commands--in this case GCP. The final file is `variables.tf`, which contains a list of variables that are used as inputs into Terraform. Any variables referenced in the `main.tf` that do not have defaults configured in `variables.tf` will result in prompts to the user at runtime.
 
-In order to run terraform, use the `deploy-cluster` Make target:
-```console
-make deploy-cluster
+Given that authentication was [configured](#configure-authentication) above, we are now ready to run Terraform. In order to establish the beginning state of your cloud infrastructure you must first initialize Terraform:
+
+```
+$ terraform init
 ```
 
-This target will initialize the necessary APIs for your project and then run terraform apply.
+This will create a hidden directory called `.terraform` in your current working directory and populate it with files used by Terraform.
 
-You will be prompted to confirm before cluster resources are created.
+It is a good practice to do a dry run of Terraform prior to running it:
+
+```
+$ terraform plan
+```
+
+Plan will prompt for any variables that do not have defaults and will output all the changes that Terraform will perform when applied. If everything looks good then it is time to put Terraform to work assembling your cloud infrastructure:
+
+```
+$ terraform apply
+```
+
+You will need to enter any variables again that don't have defaults provided. If no errors are displayed then after a few minutes you should see your Kubernetes Engine cluster in the [GCP Console](https://console.cloud.google.com/kubernetes) with the sample application deployed.
 
 ## Validation
 
@@ -137,12 +149,22 @@ Stackdriver provides a UI for viewing log events. Basic search and filtering fea
 To access the Stackdriver Logging console perform the following steps:
 
 1. In the GCP console navigate to the **Stackdriver -> Logging** page.
-2. The default logging console will load.  On this page change the resource filter to be **GKE Container**.  Your screen should look similar the screenshot below.
+2. The default logging console will load.  On this page change the resource filter to be **GKE Container -> stackdriver-logging -> default** (the **stackdriver-logging** is the cluster; and the **default** is the namespace).  Your screen should look similar the screenshot below.
 3. On this screen you can expand the bulleted log items to view more complete details about the log entry.
 
 ![Logging Console](docs/loggingconsole.png)
 
 In the logging console you can perform any type of text search, or try the various filters by log type, log level, timeframe, etc.
+
+### Viewing Log Exports
+
+The Terraform configuration built out two Log Export Sinks.  To view the sinks perform the following steps:
+
+1. In the GCP console navigate to the **Stackdriver -> Logging** page.
+2. The default logging console will load.  On the left navigation click on the **Exports** menu option.
+3. This will bring you to the **Exports** page.  You should see two Sinks in the list of log exports.
+4. You can edit/view these sinks by clicking on the context menu to the right and selecting the **Edit sink** option.
+5. Additionally, you could create additional custom export sinks by clicking on the **Create Export** option in the top of the navigation window.
 
 ### Logs in Cloud Storage
 
@@ -152,7 +174,7 @@ The Terraform configuration created a Cloud Storage Bucket named stackdriver-gke
 
 To access the Stackdriver logs in Cloud Storage perform the following steps:
 
-**Note:** The Cloud Storage Export is not populated immediately.  It may take a few minutes for logs to appear.
+**Note:** Logs from Cloud Storage Export are not populated immediately.  It may take up to 2-3 hours for logs to appear.
 
 1. In the GCP console navigate to the **Storage -> Storage** page.
 2. This loads the Cloud Storage Browser page.  On the page find the Bucket with the name stackdriver-gke-logging-<random-Id>, and click on the name (which is a hyperlink).
@@ -214,15 +236,14 @@ using `gcloud auth application-default login`.
 ** Cloud Storage Bucket not populated **
 Once the Terraform configuration is complete the Cloud Storage Bucket will be created
 but it is not always populated immediately with log data from the Kubernetes Engine cluster.  The logs
-details rarely populate in the bucket immediately.  Give the process some time (minimum of 15
-minutes) before determining that something is not working proplerly.
+details rarely populate in the bucket immediately.  Give the process some time because it can take
+up to 2 to 3 hours before the first entries start appearing (https://cloud.google.com/logging/docs/export/using_exported_logs).
 
 ** No tables created in the BigQuery dataset **
 Once the Terraform configuration is complete the BigQuery Dataset will be created
 but it will not always have tables created in it by the time you go to review the results.  The
-tables are rarely populated immediately.  Give the process some time (minimum of 15 minutes)
+tables are rarely populated immediately.  Give the process some time (minimum of 5 minutes)
 before determining that something is not working properly.
-
 
 ## Relevant Material
 * [Kubernetes Engine Logging](https://cloud.google.com/kubernetes-engine/docs/how-to/logging)
@@ -231,6 +252,3 @@ before determining that something is not working properly.
 * [Overview of Logs Exports](https://cloud.google.com/logging/docs/export/)
 * [Procesing Logs at Scale Using Cloud Dataflow](https://cloud.google.com/solutions/processing-logs-at-scale-using-dataflow)
 * [Terraform Google Cloud Provider](https://www.terraform.io/docs/providers/google/index.html)
-
-
-**This is not an officially supported Google product**
