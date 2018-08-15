@@ -62,3 +62,13 @@ check_headers:
 setup-project:
   # Runs the generate-tfvars.sh
 	./generate-tfvars.sh
+
+.PHONY: tf-apply
+tf-apply:
+	# Downloads the terraform providers and applies the configuration
+	terraform init && terraform apply
+
+.PHONY: tf-destroy
+tf-destroy:
+	# Downloads the terraform providers and applies the configuration
+	terraform destroy
