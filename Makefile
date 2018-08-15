@@ -58,3 +58,7 @@ check_headers:
 	@echo "Checking file headers"
 	@python test/verify_boilerplate.py
 
+.PHONY: setup-project
+setup-project:
+  # Runs the generate-tfvars.sh
+	./generate-tfvars.sh
