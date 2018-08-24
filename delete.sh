@@ -16,30 +16,25 @@
 
 # "---------------------------------------------------------"
 # "-                                                       -"
-# "-  Helper script to generate terraform variables        -"
-# "-  file based on glcoud defaults.                       -"
+# "-  deletes the resouses created                         -"
 # "-                                                       -"
 # "---------------------------------------------------------"
-# Stop immediately if something goes wrong
-set -euo pipefail
 
-# This script will write the terraform.tfvars file into the current working directory.
-# The purpose is to populate defaults for subsequent terraform commands.
+# Do not set errexit as it makes partial deletes impossible
+# If it is set, the script would exit if any statement returns a non-true return value
+# that means it won't destory other resources if the flow continues.
+set -o nounset
+set -o pipefail
+
 ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-# shellcheck disable=SC1090
+# shellcheck source=common.sh
 source "$ROOT"/common.sh
 
-TFVARS_FILE="./terraform.tfvars"
+# We have to delete the dataset before the Terraform
+# Otherwise we will run into the following error
+# "google_bigquery_dataset.gke-bigquery-dataset: googleapi:
+# Error 400: Dataset pso-helmsman-cicd-infra:gke_logs_dataset is still in use, resourceInUse"
+bq rm -r -f "${PROJECT}":"${BQ_LOG_DS}"
 
-if [[ -f "${TFVARS_FILE}" ]]
-then
-    echo "${TFVARS_FILE} already exists." 1>&2
-    echo "Please remove or rename before regenerating." 1>&2
-    exit 1;
-else
-    cat <<EOF > "${TFVARS_FILE}"
-project="${PROJECT}"
-zone="${ZONE}"
-EOF
-fi
-
+# Terraform destroy
+terraform destroy -auto-approve

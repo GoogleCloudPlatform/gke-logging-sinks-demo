@@ -79,11 +79,11 @@ resource "google_container_cluster" "primary" {
   }
 
   provisioner "local-exec" {
-    command = "kubectl run hello-server --image gcr.io/google-samples/hello-app:1.0 --port 8080"
+    command = "kubectl --namespace default run hello-server --image gcr.io/google-samples/hello-app:1.0 --port 8080"
   }
 
   provisioner "local-exec" {
-    command = "kubectl expose deployment hello-server --type \"LoadBalancer\" "
+    command = "kubectl --namespace default expose deployment hello-server --type \"LoadBalancer\" "
   }
 }
 
