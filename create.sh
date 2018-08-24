@@ -16,30 +16,25 @@
 
 # "---------------------------------------------------------"
 # "-                                                       -"
-# "-  Helper script to generate terraform variables        -"
-# "-  file based on glcoud defaults.                       -"
+# "-  Create starts a GKE Cluster and installs             -"
+# "-  a Cassandra StatefulSet                              -"
 # "-                                                       -"
 # "---------------------------------------------------------"
-# Stop immediately if something goes wrong
-set -euo pipefail
 
-# This script will write the terraform.tfvars file into the current working directory.
-# The purpose is to populate defaults for subsequent terraform commands.
+set -o errexit
+set -o nounset
+set -o pipefail
+
 ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-# shellcheck disable=SC1090
+# shellcheck source=common.sh
 source "$ROOT"/common.sh
 
-TFVARS_FILE="./terraform.tfvars"
+# enable apis
+"$ROOT"/scripts/enable-apis.sh
 
-if [[ -f "${TFVARS_FILE}" ]]
-then
-    echo "${TFVARS_FILE} already exists." 1>&2
-    echo "Please remove or rename before regenerating." 1>&2
-    exit 1;
-else
-    cat <<EOF > "${TFVARS_FILE}"
-project="${PROJECT}"
-zone="${ZONE}"
-EOF
-fi
+# Runs the generate-tfvars.sh
+"$ROOT"/generate-tfvars.sh
+
+terraform init -input=false && \
+terraform apply -input=false -auto-approve
 
