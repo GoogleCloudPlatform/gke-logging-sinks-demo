@@ -23,6 +23,13 @@ limitations under the License.
 //
 ///////////////////////////////////////////////////////////////////////////////////////
 
+// Provides access to available Google Container Engine versions in a zone for a given project.
+// https://www.terraform.io/docs/providers/google/d/google_container_engine_versions.html
+data "google_container_engine_versions" "on-prem" {
+  zone    = "${var.zone}"
+  project = "${var.project}"
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////
 // Create the resources needed for the Stackdriver Export Sinks
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -63,6 +70,7 @@ resource "google_container_cluster" "primary" {
   name               = "stackdriver-logging"
   zone               = "${var.zone}"
   initial_node_count = 2
+  min_master_version = "${data.google_container_engine_versions.on-prem.latest_master_version}"
 
   node_config {
     oauth_scopes = [
