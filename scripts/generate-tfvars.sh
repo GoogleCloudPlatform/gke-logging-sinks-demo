@@ -25,11 +25,11 @@ set -euo pipefail
 
 # This script will write the terraform.tfvars file into the current working directory.
 # The purpose is to populate defaults for subsequent terraform commands.
-ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-# shellcheck disable=SC1090
-source "$ROOT"/common.sh
+ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
+# shellcheck source=scripts/common.sh
+source "$ROOT"/scripts/common.sh
 
-TFVARS_FILE="./terraform.tfvars"
+TFVARS_FILE="$ROOT/terraform/terraform.tfvars"
 
 if [[ -f "${TFVARS_FILE}" ]]
 then

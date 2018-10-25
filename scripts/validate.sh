@@ -24,9 +24,9 @@
 # bash "strict-mode", fail immediately if there is a problem
 set -euo pipefail
 
-ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-# shellcheck source=common.sh
-source "$ROOT"/common.sh
+ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
+# shellcheck source=scripts/common.sh
+source "$ROOT"/scripts/common.sh
 
 # Get the kubectl credentials for the GKE cluster.
 gcloud container clusters get-credentials "$CLUSTER_NAME" --zone "$ZONE" --project "$PROJECT"
