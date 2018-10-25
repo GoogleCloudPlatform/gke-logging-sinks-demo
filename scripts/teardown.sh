@@ -26,9 +26,9 @@
 set -o nounset
 set -o pipefail
 
-ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-# shellcheck source=common.sh
-source "$ROOT"/common.sh
+ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
+# shellcheck source=scripts/common.sh
+source "$ROOT"/scripts/common.sh
 
 # We have to delete the dataset before the Terraform
 # Otherwise we will run into the following error
@@ -36,5 +36,6 @@ source "$ROOT"/common.sh
 # Error 400: Dataset pso-helmsman-cicd-infra:gke_logs_dataset is still in use, resourceInUse"
 bq rm -r -f "${PROJECT}":"${BQ_LOG_DS}"
 
-# Terraform destroy
-terraform destroy -auto-approve
+# Tear down Terraform-managed resources and remove generated tfvars
+cd "$ROOT/terraform" || exit; terraform destroy -input=false -auto-approve
+rm -f "$ROOT/terraform/terraform.tfvars"
