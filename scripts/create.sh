@@ -25,16 +25,17 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-# shellcheck source=common.sh
-source "$ROOT"/common.sh
+ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
+# shellcheck source=scripts/common.sh
+source "$ROOT"/scripts/common.sh
 
 # enable apis
 "$ROOT"/scripts/enable-apis.sh
 
-# Runs the generate-tfvars.sh
-"$ROOT"/generate-tfvars.sh
+# Generate the variables to be used by Terraform
+# shellcheck source=scripts/generate-tfvars.sh
+source "$ROOT/scripts/generate-tfvars.sh"
 
-terraform init -input=false && \
-terraform apply -input=false -auto-approve
-
+# Initialize and run Terraform
+(cd "$ROOT/terraform"; terraform init -input=false)
+(cd "$ROOT/terraform"; terraform apply -input=false -auto-approve)
