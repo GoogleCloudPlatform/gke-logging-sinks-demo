@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/usr/bin/env bash
 
 # Copyright 2018 Google LLC
 #
@@ -16,14 +16,9 @@
 
 # "---------------------------------------------------------"
 # "-                                                       -"
-# "-  Helper script to generate terraform variables        -"
-# "-  file based on glcoud defaults.                       -"
+# "-  Common commands for all scripts                      -"
 # "-                                                       -"
 # "---------------------------------------------------------"
-
-# This script will write the terraform.tfvars file into the current working directory.
-# The purpose is to populate defaults for subsequent terraform commands.
-
 # git is required for this tutorial
 command -v git >/dev/null 2>&1 || { \
  echo >&2 "I require git but it's not installed.  Aborting."; exit 1; }
@@ -58,18 +53,10 @@ if [[ -z "${PROJECT}" ]]; then
     echo "replace 'PROJECT' with the project name." 1>&2
     exit 1;
 fi
+# the CLUSTER_NAME is used by validate.sh
+# shellcheck disable=SC2034
+CLUSTER_NAME=stackdriver-logging
 
-TFVARS_FILE="./terraform.tfvars"
-
-if [[ -f "${TFVARS_FILE}" ]]
-then
-    echo "${TFVARS_FILE} already exists." 1>&2
-    echo "Please remove or rename before regenerating." 1>&2
-    exit 1;
-else
-    cat <<EOF > "${TFVARS_FILE}"
-project="${PROJECT}"
-zone="${ZONE}"
-EOF
-fi
-
+# bigquery for GKE log
+# shellcheck disable=SC2034
+BQ_LOG_DS=gke_logs_dataset

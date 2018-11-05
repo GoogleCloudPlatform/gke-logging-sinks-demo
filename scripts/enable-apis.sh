@@ -17,16 +17,13 @@
 # This script checks to make sure that the pre-requisite APIs are enabled.
 
 # Enable the Cloud Resource Manager API
-gcloud services enable cloudresourcemanager.googleapis.com
-
 # Enable the Kubernetes Engine API
-gcloud services enable container.googleapis.com
-
 # Enable the Stackdriver Logging API
-gcloud services enable logging.googleapis.com
-
 # Enable the Stackdriver Monitoring API
-gcloud services enable monitoring.googleapis.com
-
 # Enable the BigQuery API
-gcloud services enable bigquery-json.googleapis.com
+
+gcloud services enable cloudresourcemanager.googleapis.com \
+ container.googleapis.com \
+ logging.googleapis.com \
+ monitoring.googleapis.com \
+ bigquery-json.googleapis.com
