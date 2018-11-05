@@ -23,6 +23,13 @@ limitations under the License.
 //
 ///////////////////////////////////////////////////////////////////////////////////////
 
+// Provides access to available Google Container Engine versions in a zone for a given project.
+// https://www.terraform.io/docs/providers/google/d/google_container_engine_versions.html
+data "google_container_engine_versions" "on-prem" {
+  zone    = "${var.zone}"
+  project = "${var.project}"
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////
 // Create the resources needed for the Stackdriver Export Sinks
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -63,6 +70,7 @@ resource "google_container_cluster" "primary" {
   name               = "stackdriver-logging"
   zone               = "${var.zone}"
   initial_node_count = 2
+  min_master_version = "${data.google_container_engine_versions.on-prem.latest_master_version}"
 
   node_config {
     oauth_scopes = [
@@ -79,11 +87,11 @@ resource "google_container_cluster" "primary" {
   }
 
   provisioner "local-exec" {
-    command = "kubectl run hello-server --image gcr.io/google-samples/hello-app:1.0 --port 8080"
+    command = "kubectl --namespace default run hello-server --image gcr.io/google-samples/hello-app:1.0 --port 8080"
   }
 
   provisioner "local-exec" {
-    command = "kubectl expose deployment hello-server --type \"LoadBalancer\" "
+    command = "kubectl --namespace default expose deployment hello-server --type \"LoadBalancer\" "
   }
 }
 
