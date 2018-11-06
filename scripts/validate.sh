@@ -54,7 +54,6 @@ then
 fi
 echo "Step 1 of the validation passed. App is deployed."
 
-
 # Loop for up to 60 seconds waiting for service's IP address
 EXT_IP=""
 for ((i=0; i < RETRY_COUNT ; i++)); do
@@ -75,8 +74,19 @@ EXT_PORT=$(kubectl get service "$APP_NAME" -n default \
 
 echo "App is available at: http://$EXT_IP:$EXT_PORT"
 
+SERVICE_AVAILABLE=false
 # Test service availability
-[ "$(curl -s -o /dev/null -w '%{http_code}' "$EXT_IP:$EXT_PORT"/)" \
-  -eq 200 ] || exit 1
-
-echo "Step 2 of the validation passed. App handles requests."
+for ((i=0; i < RETRY_COUNT; i++)); do
+  RETURN_CODE=$(curl -s -o /dev/null -w '%{http_code}' "$EXT_IP:$EXT_PORT"/)
+  if [[ $RETURN_CODE = 200 ]]; then
+    echo "Step 2 of the validation passed. App handles requests."
+    SERVICE_AVAILABLE=true
+    break
+  fi
+  sleep 20
+done
+if [ "$SERVICE_AVAILABLE" = false ]
+then
+  echo "Unable to access the app!"
+  exit 1
+fi
