@@ -100,27 +100,12 @@ If you need to override any of the defaults, simply replace the desired value(s)
 
 There are three Terraform files provided with this example. The first one, `main.tf`, is the starting point for Terraform. It describes the features that will be used, the resources that will be manipulated, and the outputs that will result. The second file is `provider.tf`, which indicates which cloud provider and version will be the target of the Terraform commands--in this case GCP. The final file is `variables.tf`, which contains a list of variables that are used as inputs into Terraform. Any variables referenced in the `main.tf` that do not have defaults configured in `variables.tf` will result in prompts to the user at runtime.
 
-Given that authentication was [configured](#configure-authentication) above, we are now ready to run Terraform. In order to establish the beginning state of your cloud infrastructure you must first initialize Terraform:
+
+To build out the environment you can execute the following make command:
 
 ```
-$ terraform init
+$ make create
 ```
-
-This will create a hidden directory called `.terraform` in your current working directory and populate it with files used by Terraform.
-
-It is a good practice to do a dry run of Terraform prior to running it:
-
-```
-$ terraform plan
-```
-
-Plan will prompt for any variables that do not have defaults and will output all the changes that Terraform will perform when applied. If everything looks good then it is time to put Terraform to work assembling your cloud infrastructure:
-
-```
-$ terraform apply
-```
-
-You will need to enter any variables again that don't have defaults provided. If no errors are displayed then after a few minutes you should see your Kubernetes Engine cluster in the [GCP Console](https://console.cloud.google.com/kubernetes) with the sample application deployed.
 
 ## Validation
 
