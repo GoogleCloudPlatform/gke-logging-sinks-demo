@@ -74,8 +74,11 @@ EXT_PORT=$(kubectl get service "$APP_NAME" -n default \
 
 echo "App is available at: http://$EXT_IP:$EXT_PORT"
 
-SERVICE_AVAILABLE=false
 # Test service availability
+SERVICE_AVAILABLE=false
+# Loop in the test to allow the service time to become available.  They Loop
+# will continue until either the retry count is met, or a return code of 200
+# is received.
 for ((i=0; i < RETRY_COUNT; i++)); do
   RETURN_CODE=$(curl -s -o /dev/null -w '%{http_code}' "$EXT_IP:$EXT_PORT"/)
   if [[ $RETURN_CODE = 200 ]]; then
@@ -85,6 +88,7 @@ for ((i=0; i < RETRY_COUNT; i++)); do
   fi
   sleep 20
 done
+# If the service was not found send message and exit
 if [ "$SERVICE_AVAILABLE" = false ]
 then
   echo "Unable to access the app!"
