@@ -21,31 +21,48 @@
 # "---------------------------------------------------------"
 # git is required for this tutorial
 command -v git >/dev/null 2>&1 || { \
- echo >&2 "I require git but it's not installed.  Aborting."; exit 1; }
+  echo >&2 "git is required, please install: https://git-scm.com/downloads"; exit 1; }
 
 # glcoud is required for this tutorial
 command -v gcloud >/dev/null 2>&1 || { \
- echo >&2 "I require gcloud but it's not installed.  Aborting."; exit 1; }
+  echo >&2 "gcloud is required, please install: https://cloud.google.com/sdk/downloads"; exit 1; }
 
-
-REGION=$(gcloud config get-value compute/region)
-if [[ -z "${REGION}" ]]; then
-    echo "https://cloud.google.com/compute/docs/regions-zones/changing-default-zone-region" 1>&2
-    echo "gcloud cli must be configured with a default region." 1>&2
-    echo "run 'gcloud config set compute/region REGION'." 1>&2
-    echo "replace 'REGION' with the region name like us-west1." 1>&2
-    exit 1;
-fi
+# kubectl is required
+command -v kubectl >/dev/null 2>&1 || { \
+  echo >&2 "kubectl is required, please install: https://kubernetes.io/docs/tasks/tools/install-kubectl/"; exit 1; }
 
 ZONE=$(gcloud config get-value compute/zone)
+REGION=$(gcloud config get-value compute/region)
 if [[ -z "${ZONE}" ]]; then
-    echo "https://cloud.google.com/compute/docs/regions-zones/changing-default-zone-region" 1>&2
-    echo "gcloud cli must be configured with a default zone." 1>&2
-    echo "run 'gcloud config set compute/zone ZONE'." 1>&2
-    echo "replace 'ZONE' with the zone name like us-west1-a." 1>&2
-    exit 1;
+	cat <<<-EOD
+    gcloud cli must be configured with a default zone.
+    
+		https://cloud.google.com/compute/docs/regions-zones/changing-default-zone-region
+	
+	EOD
+
+	read -rp	"Enter a default zone <us-central1-a>: " ZONE
+
+  [[ -z "$ZONE" ]] && ZONE="us-central1-a"
+
+  # Set zone, if this fails, ask the user to do it manually
+  gcloud config set compute/zone "$ZONE" || { \
+    echo >&2 "Please set a default region and zone first."; exit 1; }
+
+  # Region should match zone, obtain by removing the last two characters of zone.
+  gcloud config set compute/region ${ZONE%??} || exit 1
+
+elif [[ -z "${REGION}" ]]; then
+  # A default zone is set but not a default region.
+  # We will just set a region from the zone.
+  gcloud config set compute/region ${ZONE%??} || exit 1
 fi
 
+# TODO: We should get the last created project and offer to use that.
+#
+# Because it is saved to terraform.tvars, the project ID doesn't need to be
+# set as default. This will allow the user to interact with mulitple projects
+# at the same time.
 PROJECT=$(gcloud config get-value core/project)
 if [[ -z "${PROJECT}" ]]; then
     echo "gcloud cli must be configured with a default project." 1>&2
@@ -53,6 +70,7 @@ if [[ -z "${PROJECT}" ]]; then
     echo "replace 'PROJECT' with the project name." 1>&2
     exit 1;
 fi
+
 # the CLUSTER_NAME is used by validate.sh
 # shellcheck disable=SC2034
 CLUSTER_NAME=stackdriver-logging

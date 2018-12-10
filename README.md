@@ -23,7 +23,7 @@
 
 1. Install the command line tools: [Terraform](https://www.terraform.io/downloads.html), [Google Cloud SDK](https://cloud.google.com/sdk/downloads).
 2. Create a new GCP Project with billing. Set this as default: `gcloud config set project my-project`
-3. Create: `make apply`
+3. Create and test: `make create && make validate`
 
 ## Introduction
 Stackdriver Logging can be used aggregate logs from all GCP resources as well as any custom resources (on other platforms) to allow for one centralized store for all logs and metrics.  Logs are aggregated and then viewable within the provided Stackdriver Logging UI. They can also be [exported to Sinks](https://cloud.google.com/logging/docs/export/configure_export_v2) to support more specialized of use cases.  Currently, Stackdriver Logging supports exporting to the following sinks:
@@ -44,6 +44,7 @@ You will need recent versions of the following command line tools installed:
 
 1. [Terraform](https://www.terraform.io/downloads.html). Terraform is used to automate the manipulation of cloud infrastructure.
 2. [Google Cloud SDK](https://cloud.google.com/sdk/downloads). The Google Cloud SDK is used to interact with your GCP resources.
+3. [Kubernetes kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/). kubectl is used to control Kubernetes clusters.
 3. Bash, Make. These ship with macOS and Linux.
 
 ## Project Setup and Creation
@@ -62,9 +63,12 @@ gcloud config set project your-project-id
 gcloud config set compute/region us-central1
 gcloud config set compute/zone us-central1-a
 
-make apply
+make create
 ```
 
+### Additional Make Tasks
+
+You can 
 When you are done with the demo, run `make destroy` to destory all the resources you created.
 
 
@@ -85,7 +89,7 @@ All Terraform files are in the `terraform` directory.
 - `provider.tf` Configures GCP.
 - `variables.tf` List of input variables for the project. These can be set in `terraform.tfvars`, on the command line, or as environment variables. If they are not set, you will be prompted when running terraform.
 
-You can modify the above files and rerun `make apply`. Terraform will present a plan of changes and ask if you want to apply it.
+You can modify the above files and rerun `make create`. Terraform will present a plan of changes and ask if you want to apply it.
 
 The below files are used internally by Terraform and should not be manually modified:
 
