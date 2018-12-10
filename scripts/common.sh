@@ -34,7 +34,7 @@ command -v kubectl >/dev/null 2>&1 || { \
 ZONE=$(gcloud config get-value compute/zone)
 REGION=$(gcloud config get-value compute/region)
 if [[ -z "${ZONE}" ]]; then
-	cat <<<-EOD
+	cat <<-EOD
     gcloud cli must be configured with a default zone.
     
 		https://cloud.google.com/compute/docs/regions-zones/changing-default-zone-region
