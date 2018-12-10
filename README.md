@@ -2,12 +2,9 @@
 
 ## Table of Contents
 
+* [Quick Start](#quick-start)
 * [Introduction](#introduction)
-* [Architecture](#architecture)
 * [Prerequisites](#prerequisites)
-  * [Enable GCP APIs](#enable-gcp-apis)
-  * [Install Cloud SDK](#install-cloud-sdk)
-  * [Install Terraform](#install-terraform)
 * [Deployment](#deployment)
   * [How does it work?](#how-does-it-work)
   * [Running Terraform](#running-terraform)
@@ -22,6 +19,12 @@
 * [Troubleshooting](#troubleshooting)
 * [Relevant Material](#relevant-material)
 
+## Quick Start
+
+1. Install the command line tools: [Terraform](https://www.terraform.io/downloads.html), [Google Cloud SDK](https://cloud.google.com/sdk/downloads), [Kubernetes](https://kubernetes.io/docs/tasks/tools/install-kubectl/).
+2. Create a new GCP Project with billing, set as default: `gcloud config set project PROJECT-ID`
+3. Create and test: `make create && make validate`
+
 ## Introduction
 Stackdriver Logging can be used aggregate logs from all GCP resources as well as any custom resources (on other platforms) to allow for one centralized store for all logs and metrics.  Logs are aggregated and then viewable within the provided Stackdriver Logging UI. They can also be [exported to Sinks](https://cloud.google.com/logging/docs/export/configure_export_v2) to support more specialized of use cases.  Currently, Stackdriver Logging supports exporting to the following sinks:
 * Cloud Storage
@@ -32,57 +35,45 @@ This document will describe the steps required to deploy a sample application to
 
 ## Architecture
 
-The Terraform configurations are going to build a Kubernetes Engine cluster that will generate logs and metrics that can be ingested by Stackdriver.  The scripts will also build out Logging Export Sinks for Cloud Storage, BigQuery, and Cloud Pub/Sub.  The diagram of how this will look along with the data flow can be seen in the following graphic.
-
+The Terraform configurations are going to build a Kubernetes Engine cluster that will generate logs and metrics that can be ingested by Stackdriver.  The scripts will also build out Logging Export Sinks for Cloud Storage, BigQuery, and Cloud Pub/Sub.
 ![Logging Architecture](docs/logging-architecture.png)
 
-## Prerequisites
+## Requirements
 
-The steps described in this document require the installation of several tools and the proper configuration of authentication to allow them to access your GCP resources.
+You will need recent versions of the following command line tools installed:
 
-### Cloud Project
+1. [Terraform](https://www.terraform.io/downloads.html). Terraform is used to automate the manipulation of cloud infrastructure.
+2. [Google Cloud SDK](https://cloud.google.com/sdk/downloads). The Google Cloud SDK is used to interact with your GCP resources.
+3. [Kubernetes kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/). kubectl is used to control Kubernetes clusters.
+3. Bash, Make. These ship with macOS and Linux.
 
-You'll need access to a Google Cloud Project with billing enabled. See **Creating and Managing Projects** (https://cloud.google.com/resource-manager/docs/creating-managing-projects) for creating a new project. To make cleanup easier it's recommended to create a new project.
+## Project Setup and Creation
 
-### Required GCP APIs
+After you have installed the Google Cloud SDK, create a new Google Cloud Project with billing enabled. See [Creating and Managing Projects](https://cloud.google.com/resource-manager/docs/creating-managing-projects) for creating a new project.
 
-The following APIs will be enabled in the
-* Cloud Resource Manager API
-* Kubernetes Engine API
-* Stackdriver Logging API
-* Stackdriver Monitoring API
-* BigQuery API
+You can now login with gcloud and set the default project and regions for it to use. [More on GCP regions and zones](https://cloud.google.com/compute/docs/regions-zones/).
 
-### Tools
-1. [Terraform >= 0.11.7](https://www.terraform.io/downloads.html)
-2. [Google Cloud SDK version >= 204.0.0](https://cloud.google.com/sdk/docs/downloads-versioned-archives)
-3. [kubectl matching the latest GKE version](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
-4. bash or bash compatible shell
-5. [GNU Make 3.x or later](https://www.gnu.org/software/make/)
-6. A Google Cloud Platform project where you have permission to create networks
+Last, you will use terraform to create all the GCP resources.
 
-#### Install Cloud SDK
-The Google Cloud SDK is used to interact with your GCP resources.
-[Installation instructions](https://cloud.google.com/sdk/downloads) for multiple platforms are available online.
+```
+gcloud auth application-default login
 
-#### Install kubectl CLI
+gcloud config set project your-project-id
 
-The kubectl CLI is used to interteract with both Kubernetes Engine and kubernetes in general.
-[Installation instructions](https://cloud.google.com/kubernetes-engine/docs/quickstart)
-for multiple platforms are available online.
+gcloud config set compute/region us-central1
+gcloud config set compute/zone us-central1-a
 
-#### Install Terraform
+make create
+```
 
-Terraform is used to automate the manipulation of cloud infrastructure. Its
-[installation instructions](https://www.terraform.io/intro/getting-started/install.html) are also available online.
+### Additional Make Tasks
 
-### Configure Authentication
+Test that the created resources are working as expected: `make validate`
 
-The Terraform configuration will execute against your GCP environment and create various resources.  The script will use your personal account to build out these resources.  To setup the default account the script will use, run the following command to select the appropriate account:
+When you are done with the demo, run `make teardown` to destory all the resources you created.
 
-`gcloud auth application-default login`
 
-## Deployment
+## Background
 
 ### How does it work?
 
@@ -90,43 +81,28 @@ Following the principles of [Infrastructure as Code](https://en.wikipedia.org/wi
 
 This example will start up a Kubernetes Engine cluster and deploy a simple sample application to it. By default, Kubernetes Engine clusters in GCP are provisioned with a pre-configured [Fluentd](https://www.fluentd.org/)-based collector that forwards logs to Stackdriver. Interacting with the sample app will produce logs that are visible in the Stackdriver Logging UI and other log event sinks.
 
-### Running Terraform
+### Terraform Configuration
 
-#### One-time configuration
-The terraform configuration takes two parameters to determine where the Kubernetes Engine cluster should be created:
+All Terraform files are in the `terraform` directory.
 
-* project
-* zone
+- `terraform.tfvars` User configuration for this project.
+- `main.tf` The starting point for Terraform. Contains a description of resources to create.
+- `provider.tf` Configures GCP.
+- `variables.tf` List of input variables for the project. These can be set in `terraform.tfvars`, on the command line, or as environment variables. If they are not set, you will be prompted when running terraform.
 
-For simplicity, these parameters should be specified in a file named terraform.tfvars, in the terraform directory. To generate this file based on your glcoud defaults, run:
+You can modify the above files and rerun `make create`. Terraform will present a plan of changes and ask if you want to apply it.
 
-./generate-tfvars.sh
-This will generate a terraform/terraform.tfvars file with the following keys. The values themselves will match the output of gcloud config list:
-```
-# Contents of terraform.tfvars
-project="YOUR_PROJECT"
-zone="YOUR_ZONE"
-```
+The below files are used internally by Terraform and should not be manually modified:
 
-If you need to override any of the defaults, simply replace the desired value(s) to the right of the equals sign(s). Be sure your replacement values are still double-quoted.
+- `terraform.tfstate` Current state of existing resources.
+- `.terraform` Cache of modules and plugins.
 
 
-#### Deploying the cluster
+## Using the Demo
 
-There are three Terraform files provided with this example. The first one, `main.tf`, is the starting point for Terraform. It describes the features that will be used, the resources that will be manipulated, and the outputs that will result. The second file is `provider.tf`, which indicates which cloud provider and version will be the target of the Terraform commands--in this case GCP. The final file is `variables.tf`, which contains a list of variables that are used as inputs into Terraform. Any variables referenced in the `main.tf` that do not have defaults configured in `variables.tf` will result in prompts to the user at runtime.
+A few minutes after creation you should see your Kubernetes Engine cluster in the [GCP Console](https://console.cloud.google.com/kubernetes) with the sample application deployed.
 
-
-To build out the environment you can execute the following make command:
-
-```
-$ make create
-```
-
-## Validation
-
-If no errors are displayed during deployment, after a few minutes you should see your Kubernetes Engine cluster in the [GCP Console](https://console.cloud.google.com/kubernetes) with the sample application deployed.
-
-Now that the application is deployed to Kubernetes Engine we can generate log data and use the [Stackdriver UI](https://console.cloud.google.com/logs) and other tools to view it.
+We can now generate log data and use the [Stackdriver UI](https://console.cloud.google.com/logs) and other tools to view it.
 
 ### Generating Logs
 
@@ -209,13 +185,21 @@ To access the Stackdriver logs in BigQuery perform the following steps:
 9. The results window should display some rows and columns.  You can scroll through the various rows of data that are returned, or download the results to a local file.
 10. Execute some custom queries that filter for specific data based on the results that were shown in the original query.
 
+### GCP APIs Used
+
+* Cloud Resource Manager API
+* Kubernetes Engine API
+* Stackdriver Logging API
+* Stackdriver Monitoring API
+* BigQuery API
+
 
 ## Teardown
 
 When you are finished with this example you will want to clean up the resources that were created so that you avoid accruing charges:
 
 ```
-$ terraform destroy
+make teardown
 ```
 
 Since Terraform tracks the resources it created it is able to tear them all down.
