@@ -29,10 +29,16 @@ ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
 # shellcheck source=scripts/common.sh
 source "$ROOT"/scripts/common.sh
 
-# enable apis
-"$ROOT"/scripts/enable-apis.sh
+# Enable needed APIs
+gcloud services enable \
+ bigquery-json.googleapis.com \
+ cloudresourcemanager.googleapis.com \
+ compute.googleapis.com \
+ container.googleapis.com \
+ logging.googleapis.com \
+ monitoring.googleapis.com \
 
-# Generate the variables to be used by Terraform
+# Generate the variables to be used by Terraform if it doesn't not already exist.
 # shellcheck source=scripts/generate-tfvars.sh
 source "$ROOT/scripts/generate-tfvars.sh"
 
