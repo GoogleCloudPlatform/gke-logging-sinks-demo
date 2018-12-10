@@ -2,7 +2,7 @@
 
 ## Table of Contents
 
-* [Quick Start])(#quick-start)
+* [Quick Start](#quick-start)
 * [Introduction](#introduction)
 * [Prerequisites](#prerequisites)
 * [Deployment](#deployment)
