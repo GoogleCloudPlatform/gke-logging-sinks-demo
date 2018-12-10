@@ -39,3 +39,21 @@ bq rm -r -f "${PROJECT}":"${BQ_LOG_DS}"
 # Tear down Terraform-managed resources and remove generated tfvars
 cd "$ROOT/terraform" || exit; terraform destroy -input=false -auto-approve
 rm -f "$ROOT/terraform/terraform.tfvars"
+
+rm -f "$ROOT/terraform/terraform.tfstate"
+rm -f "$ROOT/terraform/terraform.tfstate.backup"
+
+# remove kubectl context & cluster from config
+CONTEXT=$(kubectl config get-contexts -o=name | grep "$(gcloud config get-value project).*gke-bazel-tutorial")
+
+if [[ ! -z $CONTEXT ]]; then
+  kubectl config delete-context "$CONTEXT"
+  kubectl config delete-cluster "$CONTEXT"
+  kubectl config unset "users.$CONTEXT"
+
+  # unset current context if it's us
+  CURRENT=$(kubectl config current-context)
+  if [ "$CURRENT" == "$CONTEXT" ]; then
+    kubectl config unset current-context
+  fi
+fi
