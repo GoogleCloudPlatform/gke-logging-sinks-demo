@@ -15,8 +15,16 @@
 # Make will use bash instead of sh
 SHELL := /usr/bin/env bash
 
-# lint is the first target in the file so it will get picked up when you just
-#   run 'make' on its own
+.PHONY: help
+help:
+	@echo 'Usage:'
+	@echo '    make create     Create or update resources with Terraform.'
+	@echo '    make teardown   Destroy all resources managed by Terraform.'
+	@echo '    make validate   Check that installed resources work as expected.'
+	@echo '    make lint       Check syntax of all scripts.'
+	@echo
+
+.PHONY: lint
 lint: check_shell check_shebangs check_python check_golang check_terraform \
 	check_docker check_base_files check_headers check_trailing_whitespace
 
