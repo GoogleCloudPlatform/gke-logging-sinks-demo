@@ -98,18 +98,7 @@ The terraform configuration takes two parameters to determine where the Kubernet
 * project
 * zone
 
-For simplicity, these parameters should be specified in a file named terraform.tfvars, in the terraform directory. To generate this file based on your glcoud defaults, run:
-
-./generate-tfvars.sh
-This will generate a terraform/terraform.tfvars file with the following keys. The values themselves will match the output of gcloud config list:
-```
-# Contents of terraform.tfvars
-project="YOUR_PROJECT"
-zone="YOUR_ZONE"
-```
-
-If you need to override any of the defaults, simply replace the desired value(s) to the right of the equals sign(s). Be sure your replacement values are still double-quoted.
-
+These variables are saved in `terraform.tfvars` when you run `make create`.
 
 #### Deploying the cluster
 
