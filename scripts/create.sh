@@ -38,4 +38,4 @@ source "$ROOT/scripts/generate-tfvars.sh"
 
 # Initialize and run Terraform
 (cd "$ROOT/terraform"; terraform init -input=false)
-(cd "$ROOT/terraform"; terraform apply -input=false -auto-approve)
+(cd "$ROOT/terraform"; terraform apply -input=false -auto-approve -refresh=false)
