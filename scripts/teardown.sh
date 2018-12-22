@@ -37,5 +37,5 @@ source "$ROOT"/scripts/common.sh
 bq rm -r -f "${PROJECT}":"${BQ_LOG_DS}"
 
 # Tear down Terraform-managed resources and remove generated tfvars
-cd "$ROOT/terraform" || exit; terraform destroy -input=false -auto-approve
+(cd "$ROOT/terraform"; terraform destroy -input=false -auto-approve)
 rm -f "$ROOT/terraform/terraform.tfvars"
