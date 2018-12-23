@@ -34,11 +34,12 @@ source "$ROOT"/scripts/common.sh
 # Otherwise we will run into the following error
 # "google_bigquery_dataset.gke-bigquery-dataset: googleapi:
 # Error 400: Dataset pso-helmsman-cicd-infra:gke_logs_dataset is still in use, resourceInUse"
-bq rm -r -f --application_default_credential_file="${GOOGLE_APPLICATION_CREDENTIALS}" \
+bq --application_default_credential_file="${GOOGLE_APPLICATION_CREDENTIALS}" \
 --project_id="${PROJECT}" \
-"${PROJECT}":"${BQ_LOG_DS}"
-#bq rm -r -f "${PROJECT}":"${BQ_LOG_DS}"
+rm -r -f "${PROJECT}":"${BQ_LOG_DS}"
+
+echo "bq deleted"
 
 # Tear down Terraform-managed resources and remove generated tfvars
-cd "$ROOT/terraform" || exit; terraform destroy -input=false -auto-approve
+cd "$ROOT/terraform" && terraform destroy -input=false -auto-approve
 rm -f "$ROOT/terraform/terraform.tfvars"
