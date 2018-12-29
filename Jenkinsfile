@@ -66,6 +66,9 @@ spec:
           sh "gcloud config set compute/zone ${env.ZONE}"
           sh "gcloud config set core/project ${env.PROJECT_ID}"
           sh "gcloud config set compute/region ${env.REGION}"
+
+          // Set auth for bq so we don't get prompted
+          sh 'echo "credential_file=${GOOGLE_APPLICATION_CREDENTIALS}" > /home/jenkins/.bigqueryrc'
          }
     }
     stage('Lint') {
