@@ -34,6 +34,16 @@ metadata:
     jenkins: build-node
 spec:
   containers:
+  - name: jnlp
+    image: 'jenkins/jnlp-slave:3.10-1-alpine'
+    args: ['\$(JENKINS_SECRET)', '\$(JENKINS_NAME)']
+    resources:
+      limits:
+        cpu: 2
+        memory: 2Gi
+      requests:
+        cpu: 1
+        memory: 1Gi
   - name: ${containerName}
     image: gcr.io/pso-helmsman-cicd/jenkins-k8s-node:${env.CONTAINER_VERSION}
     command: ['cat']
