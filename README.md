@@ -115,18 +115,12 @@ The terraform configuration takes two parameters to determine where the Kubernet
 * project
 * zone
 
-For simplicity, these parameters should be specified in a file named terraform.tfvars, in the terraform directory. To generate this file based on your glcoud defaults, run:
-
-./generate-tfvars.sh
-This will generate a terraform/terraform.tfvars file with the following keys. The values themselves will match the output of gcloud config list:
+For simplicity, these parameters should be specified in a file named terraform.tfvars, in the terraform directory. To generate this file based on your glcoud defaults, a script will be used `./scripts/generate-tfvars.sh` to produce a `terraform/terraform.tfvars` file with the following keys. The values themselves will match the output of gcloud config list:
 ```
 # Contents of terraform.tfvars
 project="YOUR_PROJECT"
 zone="YOUR_ZONE"
 ```
-
-If you need to override any of the defaults, simply replace the desired value(s) to the right of the equals sign(s). Be sure your replacement values are still double-quoted.
-
 
 #### Deploying the cluster
 
@@ -161,7 +155,7 @@ Using the IP:Port value you can now access the application.  Go to a browser and
 
 ### Logs in the Stackdriver UI
 
-Stackdriver provides a UI for viewing log events. Basic search and filtering features are provided, which can be useful when debugging system issues. The Stackdriver Logging UI is best suited to exploring more recent log events. Users requiring longer-term storage of log events should consider some the tools in following sections.
+Stackdriver provides a UI for viewing log events. Basic search and filtering features are provided, which can be useful when debugging system issues. The Stackdriver Logging UI is best suited to exploring more recent log events. Users requiring longer-term storage of log events should consider some of the tools in following sections.
 
 To access the Stackdriver Logging console perform the following steps:
 
@@ -220,7 +214,7 @@ To access the Stackdriver logs in BigQuery perform the following steps:
 ![BigQuery](docs/bigquery.png)
 
 5. Click on the **Query Table** towards the top right to perform a custom query against the table.
-6. This opens the query window.  You can simply add an asterisk (*) after the **Select** in the window to pull all details from the current table. **Note:**A 'Select *' query is generally very expensive and not advised.  For this tutorial the dataset is limited to only the last hour of logs so the overall dataset is relatively small.
+6. This opens the query window.  You can simply add an asterisk (*) after the **Select** in the window to pull all details from the current table. **Note:** A 'Select *' query is generally very expensive and not advised.  For this tutorial the dataset is limited to only the last hour of logs so the overall dataset is relatively small.
 7. Click the **Run Query** button to execute the query and return some results from the table.
 8. A popup window till ask you to confirm running the query.  Click the **Run Query** button on this window as well.
 9. The results window should display some rows and columns.  You can scroll through the various rows of data that are returned, or download the results to a local file.
@@ -239,7 +233,7 @@ Since Terraform tracks the resources it created it is able to tear them all down
 
 ### Next Steps
 
-Having used Terraform to deploy an application to Kubernetes Engine, generated logs, and viewed them in Stackdriver, you might consider exploring [Stackdriver Monitoring](https://cloud.google.com/monitoring/) and [Stackdriver Tracing](https://cloud.google.com/trace/). Examples for these topics are available [here](../README.md) and build on the work performed with this document.
+Having used Terraform to deploy an application to Kubernetes Engine, generated logs, and viewed them in Stackdriver, you might consider exploring [Stackdriver Monitoring](https://cloud.google.com/monitoring/) and [Stackdriver Tracing](https://cloud.google.com/trace/). Examples for these topics are available [here](https://github.com/GoogleCloudPlatform?q=gke-tracing-demo++OR+gke-monitoring-tutorial) and build on the work performed with this document.
 
 ## Troubleshooting
 

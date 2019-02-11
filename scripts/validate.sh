@@ -59,7 +59,7 @@ EXT_IP=""
 for ((i=0; i < RETRY_COUNT ; i++)); do
   EXT_IP=$(kubectl get svc "$APP_NAME" -n default \
     -ojsonpath='{.status.loadBalancer.ingress[0].ip}')
-  [ ! -z "$EXT_IP" ] && break
+  [ -n "$EXT_IP" ] && break
   sleep 2
 done
 if [ -z "$EXT_IP" ]
