@@ -18,7 +18,7 @@ limitations under the License.
 //
 // This configuration will create a GKE cluster that will be used for creating
 // log information to be used by Stackdriver Logging.  The configuration will
-// also create the resources and Stackdriver Logging exports for Cloud Storage
+// also create the kubernetes resources and Stackdriver Logging exports for Cloud Storage
 // and BigQuery.
 //
 ///////////////////////////////////////////////////////////////////////////////////////
