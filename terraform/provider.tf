@@ -18,5 +18,5 @@ limitations under the License.
 // Configles the Google Cloud Provider with default settings
 provider "google" {
   project = "${var.project}"
-  version = "~> 1.13"
+  version = "~> 2.5"
 }

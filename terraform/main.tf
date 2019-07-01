@@ -55,7 +55,7 @@ resource "google_bigquery_dataset" "gke-bigquery-dataset" {
   location                    = "US"
   default_table_expiration_ms = 3600000
 
-  labels {
+  labels = {
     env = "default"
   }
 }
