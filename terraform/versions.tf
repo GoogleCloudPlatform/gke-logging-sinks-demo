@@ -14,9 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// Configles the Google Cloud Provider with default settings
-provider "google" {
-  project = var.project
-  version = "~> 2.10.0"
+terraform {
+  required_version = ">= 0.12"
 }
-
