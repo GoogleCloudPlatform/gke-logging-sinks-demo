@@ -26,8 +26,8 @@ limitations under the License.
 // Provides access to available Google Container Engine versions in a zone for a given project.
 // https://www.terraform.io/docs/providers/google/d/google_container_engine_versions.html
 data "google_container_engine_versions" "on-prem" {
-  zone    = "${var.zone}"
-  project = "${var.project}"
+  zone    = var.zone
+  project = var.project
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -55,7 +55,7 @@ resource "google_bigquery_dataset" "gke-bigquery-dataset" {
   location                    = "US"
   default_table_expiration_ms = 3600000
 
-  labels {
+  labels = {
     env = "default"
   }
 }
@@ -68,9 +68,9 @@ resource "google_bigquery_dataset" "gke-bigquery-dataset" {
 // https://www.terraform.io/docs/providers/google/d/google_container_cluster.html
 resource "google_container_cluster" "primary" {
   name               = "stackdriver-logging"
-  zone               = "${var.zone}"
+  zone               = var.zone
   initial_node_count = 2
-  min_master_version = "${data.google_container_engine_versions.on-prem.latest_master_version}"
+  min_master_version = data.google_container_engine_versions.on-prem.latest_master_version
 
   node_config {
     oauth_scopes = [
@@ -81,6 +81,7 @@ resource "google_container_cluster" "primary" {
     ]
   }
 
+  // These local-execs are used to provision the sample service
   // These local-execs are used to provision the sample service
   provisioner "local-exec" {
     command = "gcloud container clusters get-credentials ${google_container_cluster.primary.name} --zone ${google_container_cluster.primary.zone} --project ${var.project}"
@@ -125,7 +126,7 @@ resource "google_project_iam_binding" "log-writer-storage" {
   role = "roles/storage.objectCreator"
 
   members = [
-    "${google_logging_project_sink.storage-sink.writer_identity}",
+    google_logging_project_sink.storage-sink.writer_identity,
   ]
 }
 
@@ -134,6 +135,7 @@ resource "google_project_iam_binding" "log-writer-bigquery" {
   role = "roles/bigquery.dataEditor"
 
   members = [
-    "${google_logging_project_sink.bigquery-sink.writer_identity}",
+    google_logging_project_sink.bigquery-sink.writer_identity,
   ]
 }
+
