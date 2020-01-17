@@ -68,7 +68,7 @@ resource "google_bigquery_dataset" "gke-bigquery-dataset" {
 // https://www.terraform.io/docs/providers/google/d/google_container_cluster.html
 resource "google_container_cluster" "primary" {
   name               = "stackdriver-logging"
-  zone               = var.zone
+  location           = var.zone
   initial_node_count = 2
   min_master_version = data.google_container_engine_versions.on-prem.latest_master_version
 
