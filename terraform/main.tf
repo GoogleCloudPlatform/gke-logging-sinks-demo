@@ -92,7 +92,7 @@ resource "google_container_cluster" "primary" {
   }
 
   provisioner "local-exec" {
-    command = "kubectl --namespace default expose deployment hello-server --type \"LoadBalancer\" "
+    command = "kubectl --namespace default expose deployment hello-server --type \"LoadBalancer\" --port=8080"
   }
 }
 
