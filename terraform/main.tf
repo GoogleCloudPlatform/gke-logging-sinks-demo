@@ -26,8 +26,8 @@ limitations under the License.
 // Provides access to available Google Container Engine versions in a zone for a given project.
 // https://www.terraform.io/docs/providers/google/d/google_container_engine_versions.html
 data "google_container_engine_versions" "on-prem" {
-  location    = var.zone
-  project = var.project
+  location = var.zone
+  project  = var.project
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -88,11 +88,11 @@ resource "google_container_cluster" "primary" {
   }
 
   provisioner "local-exec" {
-    command = "kubectl --namespace default run hello-server --image gcr.io/google-samples/hello-app:1.0 --port 8080"
+    command = "kubectl --namespace default create deployment hello-server --image gcr.io/google-samples/hello-app:1.0"
   }
 
   provisioner "local-exec" {
-    command = "kubectl --namespace default expose deployment hello-server --type \"LoadBalancer\" "
+    command = "kubectl --namespace default expose deployment hello-server --type \"LoadBalancer\" --port=8080"
   }
 }
 
