@@ -33,9 +33,7 @@ TFVARS_FILE="$ROOT/terraform/terraform.tfvars"
 
 if [[ -f "${TFVARS_FILE}" ]]
 then
-    echo "${TFVARS_FILE} already exists." 1>&2
-    echo "Please remove or rename before regenerating." 1>&2
-    exit 1;
+    echo "${TFVARS_FILE} already exists, skipping generation."
 else
     cat <<EOF > "${TFVARS_FILE}"
 project="${PROJECT}"
